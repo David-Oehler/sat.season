@@ -1,15 +1,551 @@
+<!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8" />
-</head>
-<body>
-  <nav>
-    <a href="index.html">Start</a> | 
-    <a href="archiv.html">Archiv</a>
-  </nav>
-  
-  <img src="images/sat.season_1.jpg" alt="Aktuelles Event-Bild" width="600" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cargobeamer Optimierungskernel</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f8fb;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #475569;
+        --accent: #1d4ed8;
+        --accent-soft: #dbeafe;
+        --border: #e2e8f0;
+      }
 
-  <iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1984291927&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/dj_satoru" title="Satoru" target="_blank" style="color: #cccccc; text-decoration: none;">Satoru</a> · <a href="https://soundcloud.com/dj_satoru/satoru-unter-null-07122024" title="Satoru @ Unter Null 07.12.2024" target="_blank" style="color: #cccccc; text-decoration: none;">Satoru @ Unter Null 07.12.2024</a></div>
-</body>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      header {
+        background: linear-gradient(120deg, #0f172a, #1e3a8a);
+        color: #fff;
+        padding: 48px 8% 56px;
+      }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 48px;
+      }
+
+      nav a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      nav a:hover {
+        text-decoration: underline;
+      }
+
+      nav .links {
+        display: flex;
+        gap: 18px;
+      }
+
+      .hero {
+        max-width: 880px;
+      }
+
+      .hero a {
+        color: #bfdbfe;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .hero a:hover {
+        text-decoration: underline;
+      }
+
+      .hero h1 {
+        font-size: clamp(2rem, 3vw, 3rem);
+        margin: 0 0 16px;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+        color: #e2e8f0;
+        margin: 0 0 24px;
+      }
+
+      .hero .cta {
+        display: inline-flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .hero .cta span {
+        background: rgba(15, 23, 42, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+      }
+
+      .pill {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.15);
+        font-size: 0.85rem;
+      }
+
+      main {
+        padding: 48px 8% 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+      }
+
+      section {
+        display: grid;
+        gap: 20px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 1.6rem;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+
+      p {
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .grid {
+        display: grid;
+        gap: 20px;
+      }
+
+      .grid.three {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+
+      .grid.two {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+
+      .grid.four {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .grid.five {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 8px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .timeline {
+        display: grid;
+        gap: 16px;
+      }
+
+      .timeline-item {
+        border-left: 3px solid var(--accent);
+        padding-left: 16px;
+      }
+
+      .metric {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 14px;
+        border: 1px solid var(--border);
+      }
+
+      .metric span {
+        font-size: 0.8rem;
+        color: var(--muted);
+      }
+
+      .metric strong {
+        font-size: 1.2rem;
+      }
+
+      .flow {
+        display: grid;
+        gap: 12px;
+      }
+
+      .flow-step {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .flow-step span {
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 10px;
+        min-width: 44px;
+        text-align: center;
+      }
+
+      .ui-mock {
+        border: 1px dashed var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        background: #f8fafc;
+      }
+
+      ul {
+        margin: 10px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      footer {
+        padding: 32px 8%;
+        background: #0f172a;
+        color: #cbd5f5;
+      }
+
+      footer p {
+        color: #cbd5f5;
+      }
+
+      @media (max-width: 680px) {
+        nav {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        nav .links {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="pill">Cargobeamer · Optimierungskernel</div>
+        <div class="links">
+          <a href="#overview">Überblick</a>
+          <a href="#model">Modell</a>
+          <a href="#kernel">Kernel</a>
+          <a href="#frontend">Frontend</a>
+          <a href="#roadmap">Roadmap</a>
+        </div>
+      </nav>
+      <div class="hero">
+        <h1>Optimierungskernel für produktive Zugplanung &amp; Disposition</h1>
+        <p>
+          Zielbild für einen skalierbaren Planungs- und Dispositionskern im Cargobeamer-Verkehr, der
+          Terminalbetrieb, Zugplanung/Disposition und Customer Care in einem durchgängigen
+          Entscheidungsraum verbindet.
+        </p>
+        <p>
+          Grundlage ist die RWTH-Abschlussarbeit zur Optimierung des intermodalen Cargobeamer-Netzes:
+          <a href="https://publications.rwth-aachen.de/record/64660/files/3680.pdf" target="_blank" rel="noreferrer">
+            Studie öffnen
+          </a>.
+        </p>
+        <div class="cta">
+          <span>Basis: RWTH Abschlussarbeit (2012)</span>
+          <span>Optimierungsmodus: Rolling Horizon (24h / 72h / 14 Tage)</span>
+          <span>Output: Fahrplan, Slots, Umläufe, ETA/ETD</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="overview">
+        <h2>1. Zielbild &amp; Nutzenversprechen</h2>
+        <p>
+          Der Kernel liefert einen integrierten Entscheidungsraum, in dem Nachfrage, Kapazität und
+          operative Randbedingungen gemeinsam optimiert werden. Jede Rolle sieht denselben
+          Optimierungsstand, aber mit passenden Entscheidungshebeln und KPIs.
+        </p>
+        <div class="grid three">
+          <div class="card">
+            <span class="tag">Terminal</span>
+            <h3>Operative Machbarkeit</h3>
+            <p>
+              Durchgängige Slot- und Rampenlogik, automatische Konflikterkennung und priorisierte
+              Handling-Folgen für reibungslose Umschläge.
+            </p>
+          </div>
+          <div class="card">
+            <span class="tag">Zugplanung</span>
+            <h3>Robuste Netzplanung</h3>
+            <p>
+              Multi-Depot-Planung, Umlaufoptimierung, Puffer- und Ersatzstrategien für einen stabilen
+              Netzfahrplan.
+            </p>
+          </div>
+          <div class="card">
+            <span class="tag">Customer Care</span>
+            <h3>Service-Level</h3>
+            <p>
+              Transparente ETA/ETD, automatische Alternativen, proaktive Abweichungs-Workflows und
+              SLA-orientierte Priorisierung.
+            </p>
+          </div>
+        </div>
+        <div class="grid four">
+          <div class="metric">
+            <span>Planstabilität</span>
+            <strong>&gt; 95% Pünktlichkeit</strong>
+          </div>
+          <div class="metric">
+            <span>Auslastung</span>
+            <strong>+8-12% Kapazität</strong>
+          </div>
+          <div class="metric">
+            <span>Umlaufzeit</span>
+            <strong>-10% Ressourcenkosten</strong>
+          </div>
+          <div class="metric">
+            <span>SLA-Compliance</span>
+            <strong>&gt; 98% On-Time</strong>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Stakeholder-Kernbedarfe</h3>
+          <div class="grid five">
+            <div class="metric">
+              <span>Terminal</span>
+              <strong>Slot &amp; Rampenbalance</strong>
+            </div>
+            <div class="metric">
+              <span>Planung</span>
+              <strong>Umlaufrobustheit</strong>
+            </div>
+            <div class="metric">
+              <span>Disposition</span>
+              <strong>Störungsreaktion</strong>
+            </div>
+            <div class="metric">
+              <span>Customer Care</span>
+              <strong>ETA-Transparenz</strong>
+            </div>
+            <div class="metric">
+              <span>Commercial</span>
+              <strong>SLA &amp; Profit</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="model">
+        <h2>2. Modellierung &amp; Nebenbedingungen</h2>
+        <div class="grid two">
+          <div class="card">
+            <h3>Entscheidungsvariablen</h3>
+            <ul>
+              <li>Zugumlauf- und Abfahrtsentscheidungen je Relation.</li>
+              <li>Slot- und Rampenbelegung pro Terminalfenster.</li>
+              <li>Zuweisung von Sendungen zu Zügen (inkl. Alternativrouten).</li>
+              <li>Priorisierung nach SLA-Klassen &amp; Kundenwert.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Restriktionen</h3>
+            <ul>
+              <li>Terminalkapazitäten (Spuren, Rampen, Handlingzeiten).</li>
+              <li>Fahrplanfenster, Trassen, Umlaufzyklen.</li>
+              <li>Verfügbarkeit von Wagen, Lok, Personal und Slots.</li>
+              <li>Mindestpuffer für Störungen und Anschlussverkehre.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Zielfunktion (Beispiel)</h3>
+          <p>
+            Minimiere Gesamtkosten = Betriebskosten + Verspätungskosten + SLA-Penalties −
+            Erlösbeiträge. Gewichtung dynamisch je Rollenhorizont (tägliche Disposition vs. Netzplanung).
+          </p>
+        </div>
+      </section>
+
+      <section id="kernel">
+        <h2>3. Optimierungskernel (Back-End)</h2>
+        <p>
+          Der Kernel ist als modularer Optimierungsdienst mit Szenario-Engine, Regelwerk und KPI-Monitoring
+          aufgebaut. Die Architektur unterstützt batch- und eventbasierte Optimierung (Rolling Horizon).
+        </p>
+        <div class="grid two">
+          <div class="card">
+            <h3>Kernel-Module</h3>
+            <ul>
+              <li>Netz- und Umlaufoptimierung (MILP + Heuristik, Rolling Horizon).</li>
+              <li>Kapazitäts- &amp; Slot-Management pro Terminal und Zug.</li>
+              <li>Störungsmanagement mit What-if-Simulationen (z. B. Ausfall, Kapazitätskürzung).</li>
+              <li>Kosten-/Erlösmodell inkl. SLA-Penalties und Opportunitätskosten.</li>
+              <li>Fallback-Strategien (Ersatzrelation, Split, Re-Timing).</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Input- &amp; Output-Schnittstellen</h3>
+            <ul>
+              <li>Input: Fahrpläne, Terminalzeiten, Zugkapazitäten, Buchungen, Ressourcen.</li>
+              <li>Output: Belegung/Slots, optimierte Umläufe, Alternativrouten, ETA/ETD.</li>
+              <li>Event-Streaming für Echtzeitstatus (z. B. Gate-In, Abfahrt, Ankunft).</li>
+              <li>APIs für Preis, Verfügbarkeit, Service- &amp; SLA-Status.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Optimierungsziel (gewichtete Zielfunktion)</h3>
+          <p>
+            Minimiere Gesamtkosten &amp; Verzögerungen bei gleichzeitiger Maximierung von Auslastung,
+            Liefertreue und Terminaleffizienz. Prioritätslogik für Premium-Kunden und kritische
+            Verkehre ist integriert.
+          </p>
+        </div>
+        <div class="grid two">
+          <div class="card">
+            <h3>Optimierungsablauf</h3>
+            <div class="flow">
+              <div class="flow-step">
+                <span>01</span>
+                <p>Forecast-Update &amp; Buchungsstatus konsolidieren.</p>
+              </div>
+              <div class="flow-step">
+                <span>02</span>
+                <p>Feasibility-Check &amp; Engpässe identifizieren.</p>
+              </div>
+              <div class="flow-step">
+                <span>03</span>
+                <p>Optimierung + Szenarienvergleich für Disposition.</p>
+              </div>
+              <div class="flow-step">
+                <span>04</span>
+                <p>Freigabe, Monitoring und Event-getriggerte Re-Optimierung.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Kern-KPIs</h3>
+            <ul>
+              <li>Umlaufzeit, Auslastung, Trassen-/Slot-Nutzung.</li>
+              <li>Pünktlichkeit, SLA-Compliance, Kosten je Sendung.</li>
+              <li>Handling-Backlog, Terminaldurchsatz, Re-Routing-Quote.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="frontend">
+        <h2>4. Frontend &amp; Rollenansichten</h2>
+        <p>
+          Ein gemeinsames Frontend mit rollenbasierten Workspaces. Jede Ansicht zeigt denselben
+          Planungsstand, jedoch mit spezialisierten Entscheidungen und KPIs.
+        </p>
+        <div class="grid three">
+          <div class="card ui-mock">
+            <h3>Terminal Workspace</h3>
+            <ul>
+              <li>Slot-Belegung, Rampenplanung, Live-Queue.</li>
+              <li>Warnungen bei Überläufen und Ressourcenkonflikten.</li>
+              <li>Handlungsplan für Schichtleiter.</li>
+            </ul>
+          </div>
+          <div class="card ui-mock">
+            <h3>Disposition &amp; Zugplanung</h3>
+            <ul>
+              <li>Netz-Gantt, Umlauf-Sicht, Engpass-Heatmap.</li>
+              <li>Empfohlene Re-Routings &amp; Reservekapazitäten.</li>
+              <li>Freigabe-Workflow mit Simulationen.</li>
+            </ul>
+          </div>
+          <div class="card ui-mock">
+            <h3>Customer Care</h3>
+            <ul>
+              <li>ETA/ETD-Feed &amp; SLA-Monitor.</li>
+              <li>Alternative Angebote je Sendung.</li>
+              <li>Automatisierte Statuskommunikation.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Gemeinsame UI-Bausteine</h3>
+          <ul>
+            <li>Live-Statusband: ETA/ETD, Gate-In, Terminal-Queue, Störungsindikator.</li>
+            <li>Szenariovergleich: Baseline vs. Optimierung vs. manuelle Anpassung.</li>
+            <li>Freigabe &amp; Audit: Entscheidungslog inkl. KPI-Auswirkung.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Decision Cockpit</h3>
+          <p>
+            Zentrale Übersicht mit KPI-Deltas, Engpasskarten und Empfehlungskacheln. Änderungen werden
+            unmittelbar in Terminal- und Customer-Care-Workflows gespiegelt.
+          </p>
+        </div>
+      </section>
+
+      <section id="roadmap">
+        <h2>5. Implementierungs-Roadmap</h2>
+        <div class="timeline">
+          <div class="timeline-item card">
+            <span class="tag">Phase 1</span>
+            <h3>Data Foundation (0-3 Monate)</h3>
+            <p>Bereinigung von Fahrplan-, Slot- und Buchungsdaten. Aufbau des KPI- und Event-Streams.</p>
+          </div>
+          <div class="timeline-item card">
+            <span class="tag">Phase 2</span>
+            <h3>Pilot Kernel (3-6 Monate)</h3>
+            <p>Einführung der Kernoptimierung, Test auf Pilotrelationen und erste Dispositions-Workflows.</p>
+          </div>
+          <div class="timeline-item card">
+            <span class="tag">Phase 3</span>
+            <h3>Scale &amp; Automatisierung (6-12 Monate)</h3>
+            <p>Roll-out im Netz, Automatisierung der Störungsbehandlung und Customer-Care-Kommunikation.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        Ergebnis: Ein durchgängiger Optimierungskern, der Planung, Disposition und Service-Level
+        synchronisiert und den Produktivverkehr skalierbar macht.
+      </p>
+    </footer>
+  </body>
 </html>
